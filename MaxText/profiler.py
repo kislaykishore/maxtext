@@ -68,3 +68,12 @@ class Profiler:
         max_logging.log("WARNING: gsutil is not installed or not found in the system's PATH. Skipping upload...")
     elif self.mode == "xplane":
       jax.profiler.stop_trace()
+
+  @staticmethod
+  def should_activate_periodic_profile(config, step):
+    return config.profile_period > 0 and step > 0 and  step % config.profile_period == 0
+  
+  @staticmethod
+  def should_deactive_periodic_profile(config, step):
+    return config.profile_period > 0 and step > config.profiler_steps and  (step - config.profiler_steps) % config.profile_period == 0
+

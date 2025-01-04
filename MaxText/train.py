@@ -857,6 +857,12 @@ def train_loop(config, state=None):
         jax.block_until_ready(state)  # Block until previous state finishes to start profile cleanly
       prof.activate()
 
+    if profiler.Profiler.should_activate_periodic_profile(config, step):
+      prof = profiler.Profiler(config, optional_postfix=f"step_step")
+      if config.profile_cleanly:
+        jax.block_until_ready(state)  # Block until previous state finishes to start profile cleanly
+      prof.activate()
+
     with jax.profiler.StepTraceAnnotation("train", step_num=step):
       record_goodput(recorder, config, recorder.record_data_loading_start_time if recorder else None)
       example_batch = load_next_batch(data_iterator, example_batch, config)
@@ -943,6 +949,9 @@ def train_loop(config, state=None):
     if step == last_profiling_step:
       if config.profile_cleanly:
         jax.block_until_ready(state)  # Block until current state finishes to end profile cleanly
+      prof.deactivate()
+
+    if profiler.Profiler.should_deactivate_periodic_profile(config, step):
       prof.deactivate()
 
     if step == start_step:
