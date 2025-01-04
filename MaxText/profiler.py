@@ -70,10 +70,10 @@ class Profiler:
       jax.profiler.stop_trace()
 
   @staticmethod
-  def should_activate_periodic_profile(config, step):
-    return config.profile_period > 0 and step > 0 and  step % config.profile_period == 0
+  def should_activate_periodic_profile(config, step, start_step):
+    return config.profile_period > 0 and step > start_step + config.profiler_steps and  step % config.profile_period == 0
   
   @staticmethod
-  def should_deactive_periodic_profile(config, step):
-    return config.profile_period > 0 and step > config.profiler_steps and  (step - config.profiler_steps) % config.profile_period == 0
+  def should_deactivate_periodic_profile(config, step, start_step):
+    return config.profile_period > 0 and step > start_step + config.profiler_steps and  (step - config.profiler_steps) % config.profile_period == 0
 
